@@ -68,9 +68,6 @@ class Youtube:
                         url      - a fully qualified path of the remove file to download
                         filename - file name for output file (will be created if not exists)
         '''
-
-        # res = urllib2.urlopen(url, timeout = 60)
-        # res = urllib2.urlopen(url, timeout = 360)
         res = urllib2.urlopen(url)
 
         total_size = int(res.info().getheaders('Content-Length')[0])
@@ -104,6 +101,16 @@ class Youtube:
         return (name, videos)
 
     @staticmethod
+    def _get_csrf_key():
+        ''' A private method for fetching the csrf key '''
+        html = Youtube._http_request("http://convert2mp3.net/en/")
+        data = re.findall('var _0x(?:[0-9a-f]+)= ([0-9]+);.*?var _0x5bd1=\["(.*?)",', html, re.DOTALL)[0]
+        key = data[1].replace('\\x', '').decode('hex') # Convert hex2str
+        key = re.findall('name="(.*?)"', key)[0]
+        value = data[0]
+        return key, value
+
+    @staticmethod
     def _http_request(url):
         ''' A private method for fetching internet resources using urllib '''
         request = urllib2.Request(url, headers=Youtube._HEADERS)
@@ -118,8 +125,9 @@ class Youtube:
             video_id       - the video id
             format         - output file format
         '''
+        csrf_key, csrf_val = Youtube._get_csrf_key()	
         payload = {'url': "https://www.youtube.com/watch?v=%s" % video_id,
-                   'format': format, 'quality': '1', '85tvb5': '1583570'}
+                   'format': format, 'quality': '1', csrf_key : csrf_val }
         request = urllib2.Request("http://convert2mp3.net/en/index.php?p=convert",
                                   data=urlencode(payload), headers=Youtube._HEADERS)
         handler = urllib2.urlopen(request)
@@ -162,4 +170,4 @@ def main():
         Youtube.download_video(args.video_id)
 
 if __name__ == "__main__":
-    main()
+	main()
