@@ -102,7 +102,7 @@ class Youtube:
 
     @staticmethod
     def _get_csrf_key():
-        ''' A private method for fetching the csrf key '''
+        ''' A private method for fetching the csrf key using automated javascript deobfuscation '''
         html = Youtube._http_request("http://convert2mp3.net/en/")
         data = re.findall('var _0x(?:[0-9a-f]+)= ([0-9]+);.*?var _0x5bd1=\["(.*?)",', html, re.DOTALL)[0]
         key = data[1].replace('\\x', '').decode('hex') # Convert hex2str
