@@ -105,10 +105,10 @@ class Youtube:
     def _get_csrf_key():
         ''' A private method for fetching the csrf key using automated javascript deobfuscation '''
         html = Youtube._http_request("http://convert2mp3.net/en/")
-        data = re.findall('var _0x(?:[0-9a-f]+)= ([0-9]+);.*?var _0x(?:[0-9a-f]+)=\["(.*?)",', html, re.DOTALL)[0]
-        key = data[1].replace('\\x', '').decode('hex') # Convert hex2str
+        data = re.findall('var _0x(?:[0-9a-f]+) = ([0-9]+);.*?var _0x(?:[0-9a-f]+) = ([0-9]+) .*?var _0x(?:[0-9a-f]+)=\["(.*?)",', html, re.DOTALL)[0]
+        key = data[2].replace('\\x', '').decode('hex') # Convert hex2str
         key = re.findall('name="(.*?)"', key)[0]
-        value = data[0]
+        value = int(data[0])+int(data[1])
         return key, value
 
     @staticmethod
